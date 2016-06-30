@@ -2,9 +2,9 @@
 
 [DojiChart](http://dojichart.com) is a JavaScript library for displaying candlestick charts and technical indicators using the canvas element.
 
-## Current version - 0.5.0
+## Install
 
-This library is new (as of November 2015) and relatively untested, so please bear that in mind before deploying on your production website!
+npm install dojichart
 
 ## Features
 
@@ -29,8 +29,8 @@ Include the DojiChart CSS and JavaScript in the head of your HTML document:
 ```html
 <head>
   ...
-  <link rel="stylesheet" href="dojichart-0.5.0.css"/>
-  <script type="text/javascript" src="dojichart-0.5.0.min.js"></script>
+  <link rel="stylesheet" href="dojichart.min.css"/>
+  <script type="text/javascript" src="dojichart.min.js"></script>
 </head>
 ```
 
