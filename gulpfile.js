@@ -1,4 +1,6 @@
 
+const MODE = 'prod'; // or 'dev'
+
 var pkg = require('./package.json');
 
 // Gulp
@@ -34,8 +36,6 @@ var jsdoc = require('gulp-jsdoc3');
 
 // Test Dependencies
 var mochaPhantomjs = require('gulp-mocha-phantomjs');
-
-const MODE = 'production';
 
 function handleErrors() {
   var args = Array.prototype.slice.call(arguments);
@@ -147,10 +147,20 @@ gulp.task('clean-dist', function () {
 
 // Compress CSS and output result to build/
 gulp.task('minify-css', ['clean-dist'], function() {
-  return gulp.src('./css/**/*.css')
-    .pipe(minifyCSS())
-    .pipe(rename('dojichart.min.css'))
-    .pipe(gulp.dest('build'));
+  if(MODE === 'dev')
+  {
+    // Copy CSS to build/ without compression
+    return gulp.src('./css/dojichart.css')
+      .pipe(rename('dojichart.min.css')) // not minified
+      .pipe(gulp.dest('build'))
+  }
+  else
+  {
+    return gulp.src('./css/**/*.css')
+      .pipe(minifyCSS())
+      .pipe(rename('dojichart.min.css'))
+      .pipe(gulp.dest('build'));
+  }
 });
 
 
@@ -173,26 +183,20 @@ gulp.task('copy-bundle', ['clean-dist'], function() {
 
 // Compress / obfuscate bundle JavaScript and output to build/
 gulp.task('uglify-js', ['clean-dist', 'browserify-client'], function() {
-  return gulp.src('./build/bundle.js')
-    .pipe(uglify().on('error', gulp_util.log))
-    .pipe(rename('dojichart.min.js'))
-    .pipe(gulp.dest('build'))
-});
-
-
-// Copy bundle JavaScript to build/ without uglification for development
-gulp.task('dev-copy-js', ['browserify-client'], function() {
-  return gulp.src('./build/bundle.js')
-    .pipe(rename('dojichart.min.js')) // not minified
-    .pipe(gulp.dest('build'))
-});
-
-
-// Copy CSS to build/ without compression
-gulp.task('dev-copy-css', function() {
-  return gulp.src('./css/dojichart.css')
-    .pipe(rename('dojichart.min.css')) // not minified
-    .pipe(gulp.dest('build'))
+  if(MODE === 'dev')
+  {
+    // Copy bundle JavaScript to build/ without uglification for development
+    return gulp.src('./build/bundle.js')
+      .pipe(rename('dojichart.min.js')) // not minified
+      .pipe(gulp.dest('build'))
+  }
+  else
+  {
+    return gulp.src('./build/bundle.js')
+      .pipe(uglify().on('error', gulp_util.log))
+      .pipe(rename('dojichart.min.js'))
+      .pipe(gulp.dest('build'))
+  }
 });
 
 
@@ -223,6 +227,9 @@ gulp.task('default', ['create-dist'], function() {
 
 
 
+
+
+
 /*
 
   default
@@ -238,13 +245,23 @@ gulp.task('default', ['create-dist'], function() {
 
 */
 
-
-
-
-
-
-
-
 //gulp.task('build-dev', ['clean-dist'], function() {
 //  runSequence('copy-bundle', 'concat-css', 'dev-copy-js', 'dev-copy-css', 'copy-vendor-files', done);
 //});
+
+
+
+//gulp.task('dev-copy-js', ['browserify-client'], function() {
+//  return gulp.src('./build/bundle.js')
+//    .pipe(rename('dojichart.min.js')) // not minified
+//    .pipe(gulp.dest('build'))
+//});
+
+
+// Copy CSS to build/ without compression
+//gulp.task('dev-copy-css', function() {
+//  return gulp.src('./css/dojichart.css')
+//    .pipe(rename('dojichart.min.css')) // not minified
+//    .pipe(gulp.dest('build'))
+//});
+
