@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mocha Test Runner</title>
+    <link rel="stylesheet" href="../node_modules/mocha/mocha.css">
+    <style>
+      .dojichart { position: relative; width: 100%; }
+      .dojichart .region { position: relative; box-sizing: border-box; }
+      .dojichart .component { box-sizing: border-box; }
+      .dojichart canvas { display: block; background-color: transparent; cursor: crosshair; }
+      .dojichart canvas.layer { position: absolute; top: 0; left: 0; z-index: 2; pointer-events: none; } /* IE11+ */
+      .dojichart canvas.crosshair { position: absolute; top: 0; left: 0; z-index: 3; }
+
+      #crosshair-test-area { position: relative; }
+      #crosshair-test-area canvas.crosshair { background-color: #ddf; }
+      #crosshair-zone-test-area canvas.crosshair { background-color: #ddf; }
+
+      #mocha { clear: both; padding-top:40px; }
+    </style>
+  </head>
+  <body>
+
+    <div id="test-area">
+    </div>
+    <div id="canvas-test-area">
+    </div>
+    <div id="layer-test-area">
+    </div>
+    <div id="crosshair-test-area">
+    </div>
+    <div id="crosshair-zone-test-area">
+    </div>
+
+    <hr>
+
+    <div id="mocha"></div>
+
+    <script src="../node_modules/mocha/mocha.js"></script>
+    <script>mocha.setup('bdd')</script>
+
+    <script src="../build/client-test.js"></script>
+
+    <script>
+      if (window.mochaPhantomJS) {
+        mochaPhantomJS.run();
+      } else {
+        mocha.run();
+      }
+    </script>
+
+  </body>
+</html>
