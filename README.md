@@ -31,7 +31,7 @@ npm install dojichart
 
 Include the DojiChart CSS and JavaScript in the head of your HTML document:
 ```html
-<link rel="stylesheet" href="dojichart.min.css"/>
+<link rel="stylesheet" href="dojichart.min.css">
 <script type="text/javascript" src="dojichart.min.js"></script>
 ```
 
