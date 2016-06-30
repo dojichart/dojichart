@@ -1,0 +1,36 @@
+.dojichart {
+  position: relative;
+  width: 100%;
+}
+
+.dojichart .region {
+  position: relative;
+  box-sizing: border-box;
+}
+
+.dojichart .component {
+  box-sizing: border-box;
+}
+
+.dojichart canvas {
+  display: block;
+  background-color: transparent;
+  cursor: crosshair;
+}
+
+.dojichart canvas.layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* IE11+ */
+
+.dojichart canvas.crosshair {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+}

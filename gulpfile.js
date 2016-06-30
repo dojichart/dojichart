@@ -4,11 +4,12 @@ var pkg = require('./package.json');
 // Gulp
 var gulp = require('gulp');
 var gulp_util = require('gulp-util');
+var runSequence = require('run-sequence');
 
 // Utils
 var rename = require('gulp-rename');
 var clean = require('gulp-clean');
-var notify = require("gulp-notify");
+var notify = require('gulp-notify');
 
 // Transpiler
 var babelify = require('babelify');
@@ -34,6 +35,7 @@ var jsdoc = require('gulp-jsdoc3');
 // Test Dependencies
 var mochaPhantomjs = require('gulp-mocha-phantomjs');
 
+const MODE = 'production';
 
 function handleErrors() {
   var args = Array.prototype.slice.call(arguments);
@@ -81,10 +83,10 @@ gulp.task('headers', function() {
 
 
 // Generate documentation using source file comments
-gulp.task('jsdoc', function(cb) {
+gulp.task('jsdoc', function(done) {
   var config = require('./jsdocconfig');
   gulp.src(['./index.js', './src/**/*.js'], {read: false})
-    .pipe(jsdoc(config, cb));
+    .pipe(jsdoc(config, done));
 });
 
 
@@ -99,6 +101,7 @@ gulp.task('browserify-client', ['lint-client'], function() {
   bundler.transform(babelify.configure({presets: ["es2015"]}));
   var stream = bundler.bundle();
   return stream.on('error', handleErrors)
+  //stream.on('error', handleErrors)
     .pipe(source("./index.js"))
     .pipe(rename({basename:"bundle"}))
     .pipe(gulp.dest("build"));
@@ -135,8 +138,15 @@ gulp.task('watch', function() {
 });
 
 
+// Clean distribution directory
+gulp.task('clean-dist', function () {
+  return gulp.src('dist/*', {read: false})
+    .pipe(clean());
+});
+
+
 // Compress CSS and output result to build/
-gulp.task('minify-css', function() {
+gulp.task('minify-css', ['clean-dist'], function() {
   return gulp.src('./css/**/*.css')
     .pipe(minifyCSS())
     .pipe(rename('dojichart.min.css'))
@@ -145,7 +155,7 @@ gulp.task('minify-css', function() {
 
 
 // Concatenate CSS and output result to build/
-gulp.task('concat-css', function() {
+gulp.task('concat-css', ['clean-dist'], function() {
   return gulp.src('./css/**/*.css')
     .pipe(concatCss('dojichart.css')) // not minified
     .pipe(gulp.dest('build'));
@@ -153,19 +163,20 @@ gulp.task('concat-css', function() {
 
 
 // Copy bundle JavaScript and rename
-gulp.task('copy-bundle', function() {
+gulp.task('copy-bundle', ['clean-dist'], function() {
   return gulp.src('./build/bundle.js')
     .pipe(rename('dojichart.js')) // not minified
     .pipe(gulp.dest('build'));
+    //.on('end', done);
 });
 
 
 // Compress / obfuscate bundle JavaScript and output to build/
-gulp.task('uglify-js', ['browserify-client'], function() {
+gulp.task('uglify-js', ['clean-dist', 'browserify-client'], function() {
   return gulp.src('./build/bundle.js')
     .pipe(uglify().on('error', gulp_util.log))
     .pipe(rename('dojichart.min.js'))
-    .pipe(gulp.dest('build'));
+    .pipe(gulp.dest('build'))
 });
 
 
@@ -173,7 +184,7 @@ gulp.task('uglify-js', ['browserify-client'], function() {
 gulp.task('dev-copy-js', ['browserify-client'], function() {
   return gulp.src('./build/bundle.js')
     .pipe(rename('dojichart.min.js')) // not minified
-    .pipe(gulp.dest('build'));
+    .pipe(gulp.dest('build'))
 });
 
 
@@ -181,34 +192,59 @@ gulp.task('dev-copy-js', ['browserify-client'], function() {
 gulp.task('dev-copy-css', function() {
   return gulp.src('./css/dojichart.css')
     .pipe(rename('dojichart.min.css')) // not minified
-    .pipe(gulp.dest('build'));
+    .pipe(gulp.dest('build'))
 });
 
 
-// Build for development (no uglification / compression)
-gulp.task('build-dev', ['copy-bundle', 'concat-css', 'dev-copy-js', 'dev-copy-css']);
-
-
-// Build for distribution
-gulp.task('build', ['copy-bundle', 'concat-css', 'uglify-js', 'minify-css']);
-
-
-// Clean distribution directory
-gulp.task('clean-dist', function () {
-  return gulp.src('dist/*', {read: false})
-    .pipe(clean());
+// Build (for development: no uglification / compression)
+gulp.task('build', [
+  'copy-bundle',
+  'concat-css',
+  'uglify-js',
+  'minify-css'
+], function() {
 });
 
 
 // Create distribution
-gulp.task('dist', ['clean-dist', 'build'], function() {
-  return gulp.src(["build/dojichart.js", "build/dojichart.css", "build/dojichart.min.css", "build/dojichart.min.js"])
+gulp.task('create-dist', ['build'], function() {
+  return gulp.src(["build/dojichart.js",
+                   "build/dojichart.css",
+                   "build/dojichart.min.css",
+                   "build/dojichart.min.js",
+                   "node_modules/jquery/dist/jquery.min.js"])
     .pipe(gulp.dest('dist'));
 });
 
 
-// Create distribution for development
-gulp.task('dev', ['clean-dist', 'build-dev'], function() {
-  return gulp.src(["build/dojichart.js", "build/dojichart.css", "build/dojichart.min.css", "build/dojichart.min.js"])
-    .pipe(gulp.dest('dist'));
+// Default
+gulp.task('default', ['create-dist'], function() {
 });
+
+
+
+/*
+
+  default
+    > create-dist
+      > build
+        > copy-bundle
+          > clean-dist
+        > concat-css
+        > uglify-js
+          > browserify-client
+            > lint-client
+        > minify-css
+
+*/
+
+
+
+
+
+
+
+
+//gulp.task('build-dev', ['clean-dist'], function() {
+//  runSequence('copy-bundle', 'concat-css', 'dev-copy-js', 'dev-copy-css', 'copy-vendor-files', done);
+//});
