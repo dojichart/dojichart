@@ -3,6 +3,7 @@
 var _ = require("underscore");
 var Panel = require("../panel/Panel");
 var TimeGridLayer = require("../layer/TimeGridLayer");
+var adjustCanvas = require('../core/adjustCanvas')
 
 const _default_config = {
 };
@@ -86,6 +87,7 @@ class TimePanel extends Panel {
     var canvas = this.getEl();
     canvas.setAttribute("width", this.getWidth());
     canvas.setAttribute("height", this.getHeight());
+    adjustCanvas(canvas)
   }
 
   /**

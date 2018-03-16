@@ -1,6 +1,8 @@
 "use strict";
 
 var Type = require("../core/Type");
+var adjustCanvas = require('../core/adjustCanvas')
+
 
 /**
  * Represents a crosshair (pair of crosshairs) overlaid on a chart component.
@@ -37,6 +39,7 @@ class CrosshairZone extends Type {
     canvas.setAttribute("ch-zone-index", ""+zone_index+"");
     canvas.setAttribute("width", comp.getWidth());
     canvas.setAttribute("height", comp.getHeight());
+    adjustCanvas(canvas);
     this._el = canvas;
     region_el.appendChild(canvas);
     return canvas;
