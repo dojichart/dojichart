@@ -1,7 +1,7 @@
 "use strict";
 
 var Type = require("../core/Type");
-var adjustCanvas = require('../core/adjustCanvas')
+var adjustCanvas = require('../core/adjustCanvas');
 
 
 /**
